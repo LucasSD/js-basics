@@ -1,2 +1,2 @@
 # js-basics
-Just some basic challenges with tests. 
+Just some basic javacsript challenges with tests. 
