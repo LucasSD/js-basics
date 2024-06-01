@@ -31,8 +31,26 @@ function genUser() {
             Location: `${userData.location.state}, ${userData.location.country}`,
             Age: userData.dob.age,
             }
+            document.body.style.backgroundColor = userData.gender === "female" ? 'lightblue' : "pink"
 
-            console.log(userDetails)
+            // console.log(userDetails)
+                Object.entries(userDetails).forEach(([key, value]) => {
+                        // console.log(`${key}: ${value}`);
+                        const p = document.createElement('p')
+                        p.className = "text-xl"
+                        const span = document.createElement('span')
+                        span.className = "font-bold"
+                        const keyTextNode = document.createTextNode(`${key}: `);
+                        const valueTextNode = document.createTextNode(value);
+                        span.appendChild(keyTextNode)
+                        p.appendChild(span)
+                        p.appendChild(valueTextNode)
+
+
+                        thirdDiv.appendChild(p)
+
+
+                });
         })
         .catch(error => {
             console.error('Error fetching user data:', error);
