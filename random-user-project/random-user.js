@@ -1,66 +1,84 @@
-userBtn = document.getElementById("generate")
+document.addEventListener("DOMContentLoaded", () => {
+        const userBtn = document.getElementById("generate");
+        userBtn.addEventListener("click", genUser);
+        genUser();
+});
+
+function fetchUserData() {
+        showSpinner()
+        return fetch('https://randomuser.me/api')
+            .then(response => response.json())
+            .then(data => data.results[0])
+            .catch(error => {
+                    console.error('Error fetching user data:', error);
+                    return null;
+            });
+}
+
+function createUserElement(tag, className, textContent = '') {
+        const element = document.createElement(tag);
+        element.className = className;
+        element.textContent = textContent;
+        return element;
+}
+
+function displayUserDetails(userDetails) {
+        const thirdDiv = createUserElement('div', 'space-y-3');
+        Object.entries(userDetails).forEach(([key, value]) => {
+                const p = createUserElement('p', 'text-xl');
+                const span = createUserElement('span', 'font-bold', `${key}: `);
+                p.appendChild(span);
+                p.appendChild(document.createTextNode(value));
+                thirdDiv.appendChild(p);
+        });
+        return thirdDiv;
+}
+
+function setUserBackground(gender) {
+        document.body.style.backgroundColor = gender === "female" ? 'lightblue' : "pink";
+}
 
 function genUser() {
-    fetch('https://randomuser.me/api')
-        .then((response) => response.json())
-        .then(data => {
-            const user = document.getElementById("user")
-            user.innerHTML = ""
-            const firstDiv = document.createElement('div')
-            firstDiv.className = "flex justify-between"
-            const secondDiv = document.createElement('div')
-            secondDiv.className = "flex"
-            firstDiv.appendChild(secondDiv)
-            user.appendChild(firstDiv)
+        fetchUserData().then(userData => {
+                hideSpinner()
+                if (!userData) return;
 
-            const img = document.createElement('img')
-            img.className = "w-48 h-48 rounded-full mr-8"
-            img.src = data.results[0].picture.large
+                setUserBackground(userData.gender);
 
-            secondDiv.appendChild(img) // Append the img to secondDiv
+                const user = document.getElementById("user");
+                user.innerHTML = "";
 
-            const thirdDiv = document.createElement('div')
-            thirdDiv.className = "space-y-3"
+                const firstDiv = createUserElement('div', 'flex justify-between');
+                const secondDiv = createUserElement('div', 'flex');
+                firstDiv.appendChild(secondDiv);
+                user.appendChild(firstDiv);
 
-            secondDiv.appendChild(thirdDiv)
+                const img = createUserElement('img', 'w-48 h-48 rounded-full mr-8');
+                img.src = userData.picture.large;
+                secondDiv.appendChild(img);
 
-            const userData = data.results[0]
-            const userDetails = {Name: `${userData.name.first} ${userData.name.last}`,
-            Email: userData.email,
-            Phone: userData.phone,
-            Location: `${userData.location.state}, ${userData.location.country}`,
-            Age: userData.dob.age,
-            }
-            document.body.style.backgroundColor = userData.gender === "female" ? 'lightblue' : "pink"
+                const userDetails = {
+                        Name: `${userData.name.first} ${userData.name.last}`,
+                        Email: userData.email,
+                        Phone: userData.phone,
+                        Location: `${userData.location.state}, ${userData.location.country}`,
+                        Age: userData.dob.age,
+                };
 
-            // console.log(userDetails)
-                Object.entries(userDetails).forEach(([key, value]) => {
-                        // console.log(`${key}: ${value}`);
-                        const p = document.createElement('p')
-                        p.className = "text-xl"
-                        const span = document.createElement('span')
-                        span.className = "font-bold"
-                        const keyTextNode = document.createTextNode(`${key}: `);
-                        const valueTextNode = document.createTextNode(value);
-                        span.appendChild(keyTextNode)
-                        p.appendChild(span)
-                        p.appendChild(valueTextNode)
-
-
-                        thirdDiv.appendChild(p)
-
-
-                });
-        })
-        .catch(error => {
-            console.error('Error fetching user data:', error);
-        })
+                const thirdDiv = displayUserDetails(userDetails);
+                secondDiv.appendChild(thirdDiv);
+        });
 }
 
-// This block should be outside the genUser function
+function showSpinner() {
+        document.querySelector('.spinner').style.display = 'block';
+}
+
+function hideSpinner() {
+        document.querySelector('.spinner').style.display = 'none';
+}
+
+// Export genUser function if in a module environment
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = genUser;
+        module.exports = {genUser, createUserElement};
 }
-
-userBtn.addEventListener("click", genUser)
-document.addEventListener("DOMContentLoaded", genUser)
