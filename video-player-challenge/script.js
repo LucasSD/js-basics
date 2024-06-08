@@ -48,7 +48,7 @@ function updatePlayButtonIcon(isPlaying) {
     }
 }
 
-function setProgress(e) {
+function setProgress() {
     const setPercent = this.value;
     const duration = video.duration;
     video.currentTime = (setPercent / 100) * duration;
